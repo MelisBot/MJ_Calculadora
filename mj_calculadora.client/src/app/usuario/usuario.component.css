@@ -1,0 +1,10 @@
+.table-container {
+  display: flex;
+  justify-content: center; /* centra horizontalmente */
+  margin-top: 20px; /* espacio arriba */
+}
+
+  .table-container table {
+    width: auto; /* la tabla se ajusta al contenido */
+    max-width: 90%; /* evita que se desborde en pantallas pequeñas */
+  }

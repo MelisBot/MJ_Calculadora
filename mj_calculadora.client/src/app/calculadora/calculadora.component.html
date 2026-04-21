@@ -1,0 +1,48 @@
+<!--Usaremos Bootstrap para sitio responsivo-->
+
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Calculadora</h2>
+    </div>
+    <div class="card-body">
+      <form>
+        <div class="row mb-3">
+
+          <div class="col-md-6">
+            <label for="num1" class="form-label">Número 1</label>
+            <!--El ngModel conecta una propiedad del componente con un elemento de la vista-->
+            <input id="num1" type="number" class="form-control" [(ngModel)]="operacion.num1" name="num1" />
+          </div>
+
+          <div class="col-md-6">
+            <label for="num2" class="form-label">Número 2</label>
+            <input id="num2" type="number" class="form-control" [(ngModel)]="operacion.num2" name="num1" />
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-12 d-flex flex-wrap gap-2">
+            <!--(click) para llamar a los metodos-->
+            <button type="button" class="btn btn-success" (click)="suma()">Sumar</button>
+            <button type="button" class="btn btn-success" (click)="resta()">Resta</button>
+            <button type="button" class="btn btn-success" (click)="multiplicar()">Multiplicar</button>
+            <button type="button" class="btn btn-success" (click)="dividir()">Dividir</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="row">
+        <div class="col-12">
+          <div class="alert alert-secondary">
+            <h5 class="mb-0">Resultado:{{operacion.resultado}}</h5>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!--Usando estilos CSS-->

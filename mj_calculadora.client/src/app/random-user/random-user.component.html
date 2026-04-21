@@ -1,0 +1,48 @@
+
+<div class="container mt-4">
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <!--Boton agregar-->
+      <button class="btn btn-primary" (click)="agregarUsuario()"> <!--Llamamos al metodo agregarUsuario-->
+        Agregar Usuario
+      </button>
+    </div>
+  </div>
+
+  <!--Tabla-->
+  <div class="row">
+    <div class=" col-md-12">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Dirección</th>
+            <th>Sexo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.name.first }}</td>
+            <td>{{ user.name.last }}</td>
+            <td>{{ user.phone }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              {{ user.location.street.name }} {{ user.location.street.number }},
+              {{ user.location.city }}, {{ user.location.country }}
+            </td>
+            <td>
+              <img *ngIf="user.gender === 'male'" src="../assets/masculino.png" alt="Masculino" class="gender-icon">
+              <img *ngIf="user.gender === 'female'" src="../assets/femenino.png" alt="Femenino" class="gender-icon">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+  </div>
+</div>
+

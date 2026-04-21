@@ -1,0 +1,149 @@
+<div class="container mt-4">
+  <h2>Usuarios</h2>
+
+  <!-- Mensaje de error o confirmación -->
+  <div *ngIf="mensaje" class="alert alert-info">
+    {{ mensaje }}
+  </div>
+
+  <!-- Botón para mostrar el formulario -->
+  <div class="mb-3">
+    <button class="btn btn-primary" (click)="agregarUsuario()">Agregar Usuario</button>
+  </div>
+
+  <!-- Formulario visible solo si mostrarFormulario es true -->
+  <form *ngIf="mostrarFormulario" (ngSubmit)="guardarUsuario()" #usuarioForm="ngForm" class="mb-4">
+    <div class="row">
+      <div class="col-md-4">
+        <label for="userName" class="form-label">UserName</label>
+        <input id="userName" type="text" class="form-control"
+               [(ngModel)]="nuevoUsuario.userName" name="userName" required />
+      </div>
+      <div class="col-md-4">
+        <label for="nombre" class="form-label">Nombre</label>
+        <input id="nombre" type="text" class="form-control"
+               [(ngModel)]="nuevoUsuario.nombre" name="nombre" required />
+      </div>
+      <div class="col-md-4">
+        <label for="apellidoPaterno" class="form-label">Apellido Paterno</label>
+        <input id="apellidoPaterno" type="text" class="form-control"
+               [(ngModel)]="nuevoUsuario.apellidoPaterno" name="apellidoPaterno" required />
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-md-4">
+        <label for="apellidoMaterno" class="form-label">Apellido Materno</label>
+        <input id="apellidoMaterno" type="text" class="form-control"
+               [(ngModel)]="nuevoUsuario.apellidoMaterno" name="apellidoMaterno" />
+      </div>
+      <div class="col-md-4">
+        <label for="email" class="form-label">Email</label>
+        <input id="email" type="email" class="form-control"
+               [(ngModel)]="nuevoUsuario.email" name="email" required />
+      </div>
+      <div class="col-md-4">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" type="password" class="form-control"
+               [(ngModel)]="nuevoUsuario.password" name="password" required />
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-md-4">
+        <label for="telefono" class="form-label">Teléfono</label>
+        <input id="telefono" type="text" class="form-control"
+               [(ngModel)]="nuevoUsuario.telefono" name="telefono" required />
+      </div>
+      <div class="col-md-4">
+        <label for="celular" class="form-label">Celular</label>
+        <input id="celular" type="text" class="form-control"
+               [(ngModel)]="nuevoUsuario.celular" name="celular" />
+      </div>
+      <div class="col-md-4">
+        <label for="sexo" class="form-label">Sexo</label>
+        <select id="sexo" class="form-select"
+                [(ngModel)]="nuevoUsuario.sexo" name="sexo" required>
+          <option value="">Seleccione...</option>
+          <option value="M">Masculino</option>
+          <option value="F">Femenino</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-md-4">
+        <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+        <input id="fechaNacimiento" type="date" class="form-control"
+               [(ngModel)]="nuevoUsuario.fechaNacimiento" name="fechaNacimiento" />
+      </div>
+      <div class="col-md-4">
+        <label for="curp" class="form-label">CURP</label>
+        <input id="curp" type="text" class="form-control"
+               [(ngModel)]="nuevoUsuario.curp" name="curp" />
+      </div>
+      <div class="col-md-4">
+        <label for="idRol" class="form-label">Rol (Id)</label>
+        <input id="idRol" type="number" class="form-control"
+               [(ngModel)]="nuevoUsuario.idRol" name="idRol" required />
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3 me-2">
+      {{ modoActualizar ? 'Actualizar' : 'Guardar' }}
+    </button>
+    <button type="button" class="btn btn-secondary mt-3" (click)="cancelar()">Cancelar</button>
+  </form>
+
+  <div class="table-container" *ngIf="usuarios.length > 0">
+    <table class="table table-striped table-bordered table-hover align-middle">
+      <thead class="table-dark text-center">
+        <tr>
+          <th>Id</th>
+          <th>UserName</th>
+          <th>Nombre</th>
+          <th>Apellido Paterno</th>
+          <th>Apellido Materno</th>
+          <th>Email</th>
+          <th>Sexo</th>
+          <th>Fecha Nacimiento</th>
+          <th>Teléfono</th>
+          <th>Celular</th>
+          <th>Estatus</th>
+          <th>CURP</th>
+          <th>Rol (Id)</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuarios" class="align-middle text-center">
+          <td>{{ usuario.idUsuario }}</td>
+          <td>{{ usuario.userName }}</td>
+          <td>{{ usuario.nombre }}</td>
+          <td>{{ usuario.apellidoPaterno }}</td>
+          <td>{{ usuario.apellidoMaterno }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>{{ usuario.sexo }}</td>
+          <td>{{ usuario.fechaNacimiento | date:'yyyy-MM-dd' }}</td>
+          <td>{{ usuario.telefono }}</td>
+          <td>{{ usuario.celular }}</td>
+          <td>{{ usuario.estatus ? 'Activo' : 'Inactivo' }}</td>
+          <td>{{ usuario.curp }}</td>
+          <td>{{ usuario.idRol }}</td>
+          <td>
+            <button class="btn btn-warning btn-sm me-2" (click)="editarUsuario(usuario)">Editar</button>
+            <button class="btn btn-danger btn-sm" (click)="eliminarUsuario(usuario.idUsuario)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- Mensaje si no hay usuarios -->
+  <div *ngIf="usuarios.length === 0 && !mensaje">
+    <div class="alert alert-warning">
+      No hay usuarios registrados.
+    </div>
+  </div>
+</div>
