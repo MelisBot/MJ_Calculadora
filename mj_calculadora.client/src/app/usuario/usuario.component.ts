@@ -88,10 +88,11 @@ export class UsuarioComponent implements OnInit{
     this.nuevoUsuario = this.inicializarUsuario();
   }
 
-  guardarUsuario(): void {
+  //Guardar(agregar o actualizar)
+  guardarUsuario(usuario:Usuario): void {
     if (this.modoActualizar) {
       // Actualizar
-      this.usuarioService.update(this.nuevoUsuario.idUsuario, this.nuevoUsuario).subscribe({
+      this.usuarioService.update(usuario.idUsuario, usuario).subscribe({
         next: (result: Result) => {
           if (result.correct) {
             this.mensaje = 'Usuario actualizado correctamente';
@@ -107,7 +108,7 @@ export class UsuarioComponent implements OnInit{
       });
     } else {
       // Agregar
-      const usuarioAgregar = { ...this.nuevoUsuarioAdd, ...this.nuevoUsuario };
+      const usuarioAgregar = { ...this.nuevoUsuarioAdd, ...usuario };
       this.usuarioService.add(usuarioAgregar).subscribe({
         next: (res: Result) => {
           if (res.correct) {

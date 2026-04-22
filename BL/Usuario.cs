@@ -3,6 +3,7 @@
 using DL;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BL
 {
@@ -21,16 +22,16 @@ namespace BL
             ML.Result result = new ML.Result();
             try
             {
-                var usuarios = _context.Usuarios.FromSqlRaw("EXEC GetAllUsuario").ToList();
+                var usuarioslist = _context.Usuarios.FromSqlRaw("EXEC GetAllUsuario").ToList();
 
-                if (usuarios != null)
+                if (usuarioslist.Count > 0)
                 {
                     result.Objects = new List<object>();
 
-                    foreach (var item in usuarios)
+                    foreach (var item in usuarioslist)
                     {
                         ML.Usuario usuario = new ML.Usuario();
-                        
+
 
                         usuario.IdUsuario = item.IdUsuario;
                         usuario.UserName = item.UserName;
@@ -87,7 +88,7 @@ namespace BL
                     new SqlParameter("@ApellidoMaterno", (object?)usuario.ApellidoMaterno ?? DBNull.Value),
                     new SqlParameter("@Email", usuario.Email ?? (object)DBNull.Value),
                     new SqlParameter("@Password", usuario.Password ?? (object)DBNull.Value),
-                    new SqlParameter("@FechaNacimiento", (object?)usuario.FechaNacimiento ?? DBNull.Value), 
+                    new SqlParameter("@FechaNacimiento", (object?)usuario.FechaNacimiento ?? DBNull.Value),
                     new SqlParameter("@Sexo", usuario.Sexo ?? (object)DBNull.Value),
                     new SqlParameter("@Telefono", usuario.Telefono ?? (object)DBNull.Value),
                     new SqlParameter("@Celular", (object?)usuario.Celular ?? DBNull.Value),
@@ -107,19 +108,24 @@ namespace BL
             }
             return result;
         }
-
-
-        public ML.Result DeleteSPEF(int idUsuario) 
+        public ML.Result DeleteSPEF(int idUsuario)
         {
             ML.Result result = new ML.Result();
             try
             {
-                _context.Database.ExecuteSqlRaw(
+                int filasAfectadas = _context.Database.ExecuteSqlRaw(
                     "EXEC DeleteUsuario @IdUsuario",
                     new SqlParameter("@IdUsuario", idUsuario)
                 );
-
-                result.Correct = true;
+                if (filasAfectadas > 0)
+                {
+                    result.Correct = true;
+                }
+                else
+                {
+                    result.Correct = false;
+                    result.ErrorMessage = "El usuario no se pudo eliminar correctamente";
+                }
             }
             catch (Exception ex)
             {
@@ -136,32 +142,43 @@ namespace BL
             ML.Result result = new ML.Result();
             try
             {
-                var query = _context.Usuarios.FirstOrDefault(usuarioEntity => usuarioEntity.IdUsuario == usuario.IdUsuario); //Toma el primero sin lanzar excepcion
+                //var query = _context.Usuarios.FirstOrDefault(usuarioEntity => usuarioEntity.IdUsuario == usuario.IdUsuario); //Toma el primero sin lanzar excepcion
 
-                if (query != null)
+                using (DL.MjimenezUsuariosContext context = new DL.MjimenezUsuariosContext())
                 {
-                    query.UserName = usuario.UserName;
-                    query.Nombre = usuario.Nombre;
-                    query.ApellidoPaterno = usuario.ApellidoPaterno;
-                    query.ApellidoMaterno = usuario.ApellidoMaterno;
-                    query.Email = usuario.Email;
-                    query.Password = usuario.Password;
-                    usuario.FechaNacimiento = usuario.FechaNacimiento;
-                    query.Sexo = usuario.Sexo;
-                    query.Telefono = usuario.Telefono;
-                    query.Celular = usuario.Celular;
-                    query.Estatus = usuario.Estatus;
-                    query.Curp = usuario.CURP;
-                    query.Imagen = null;
-                    query.IdRol = usuario.idRol;
 
-                    _context.SaveChanges();
-                    result.Correct = true;
-                }
-                else
-                {
-                    result.Correct = false;
-                    result.ErrorMessage = "Usuario no encontrado para actualizar";
+                    var query = (from usuarioEntity in context.Usuarios
+                                 where usuarioEntity.IdUsuario == usuario.IdUsuario
+                                 select usuarioEntity).FirstOrDefault();
+
+                    if (query != null)
+                    {
+                        query.UserName = usuario.UserName;
+                        query.Nombre = usuario.Nombre;
+                        query.ApellidoPaterno = usuario.ApellidoPaterno;
+                        query.ApellidoMaterno = usuario.ApellidoMaterno;
+                        query.Email = usuario.Email;
+                        query.Password = usuario.Password;
+                        usuario.FechaNacimiento = usuario.FechaNacimiento;
+                        query.Sexo = usuario.Sexo;
+                        query.Telefono = usuario.Telefono;
+                        query.Celular = usuario.Celular;
+                        query.Estatus = usuario.Estatus;
+                        query.Curp = usuario.CURP;
+                        query.Imagen = null;
+                        query.IdRol = usuario.idRol;
+
+                        int filasAfectadas = context.SaveChanges();
+                        if (filasAfectadas > 0)
+                        {
+                            result.Correct = true;
+                        }
+                        else
+                        {
+                            result.Correct = false;
+                            result.ErrorMessage = "Usuario no encontrado para actualizar";
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -174,45 +191,71 @@ namespace BL
         }
 
         //GetById LINQ
-        public ML.Result GetById(int idUsuario) 
+        public ML.Result GetById(int idUsuario)
         {
             ML.Result result = new ML.Result();
-            try 
+            try
             {
-                var item = _context.Usuarios.FirstOrDefault(usuario => usuario.IdUsuario == idUsuario);
-
-                if (item != null)
+                //var item = _context.Usuarios.FirstOrDefault(usuario => usuario.IdUsuario == idUsuario);
+                using (DL.MjimenezUsuariosContext context = new DL.MjimenezUsuariosContext())
                 {
-                    ML.Usuario usuario = new ML.Usuario();
-                    usuario.Rol = new ML.Rol();
+                    var query = (from usuario in context.Usuarios
+                                 join Rol in context.Rols on usuario.IdRol equals Rol.IdRol into UsuarioRol
+                                 from rolUsuario in UsuarioRol.DefaultIfEmpty()
+                                 where usuario.IdUsuario == idUsuario
+                                 select new
+                                 {
+                                     usuario.IdUsuario,
+                                     usuario.UserName,
+                                     usuario.Nombre,
+                                     usuario.ApellidoPaterno,
+                                     ApellidoMaterno = usuario.ApellidoMaterno ?? "",
+                                     usuario.Email,
+                                     usuario.Password,
+                                     usuario.FechaNacimiento,
+                                     usuario.Sexo,
+                                     usuario.Telefono,
+                                     Celular = usuario.Celular ?? "",
+                                     usuario.Estatus,
+                                     Curp = usuario.Curp ?? "",
+                                     usuario.Imagen,
+                                     IdRol = rolUsuario != null ? rolUsuario.IdRol : 0,
+                                     RolNombre = rolUsuario != null ? rolUsuario.Nombre : "Sin rol"
 
-                    usuario.IdUsuario = item.IdUsuario;
-                    usuario.UserName = item.UserName;
-                    usuario.Nombre = item.Nombre;
-                    usuario.ApellidoPaterno = item.ApellidoPaterno;
-                    usuario.ApellidoMaterno = item.ApellidoMaterno;
-                    usuario.Email = item.Email;
-                    usuario.Password = item.Password;
-                    usuario.FechaNacimiento =item.FechaNacimiento.ToDateTime(TimeOnly.MinValue);
-                    usuario.Sexo = item.Sexo;
-                    usuario.Telefono = item.Telefono;
-                    usuario.Celular = item.Celular;
-                    usuario.Estatus = item.Estatus;
-                    usuario.CURP = item.Curp;
-                    usuario.Imagen = item.Imagen;
+                                 }).FirstOrDefault();
 
-                    if (item.IdRol != null)
+                    if (query != null)
                     {
-                        usuario.idRol = item.IdRol.Value;
-                    }
+                        ML.Usuario usuario = new ML.Usuario();
+                        usuario.Rol = new ML.Rol();
 
-                    result.Object = usuario;
-                    result.Correct = true;
-                }
-                else
-                {
-                    result.Correct = false;
-                    result.ErrorMessage = "Usuario no encontrado";
+                        usuario.IdUsuario = query.IdUsuario;
+                        usuario.UserName = query.UserName;
+                        usuario.Nombre = query.Nombre;
+                        usuario.ApellidoPaterno = query.ApellidoPaterno;
+                        usuario.ApellidoMaterno = query.ApellidoMaterno;
+                        usuario.Email = query.Email;
+                        usuario.Password = query.Password;
+                        usuario.FechaNacimiento = query.FechaNacimiento.ToDateTime(TimeOnly.MinValue);
+                        usuario.Sexo = query.Sexo;
+                        usuario.Telefono = query.Telefono;
+                        usuario.Celular = query.Celular;
+                        usuario.Estatus = query.Estatus;
+                        usuario.CURP = query.Curp;
+                        usuario.Imagen = query.Imagen;
+
+                        usuario.idRol = query.IdRol;
+                        usuario.Rol.IdRol = query.IdRol;
+                        usuario.Rol.Nombre = query.RolNombre;
+
+                        result.Object = usuario;
+                        result.Correct = true;
+                    }
+                    else
+                    {
+                        result.Correct = false;
+                        result.ErrorMessage = "Usuario no encontrado";
+                    }
                 }
             }
             catch (Exception ex)

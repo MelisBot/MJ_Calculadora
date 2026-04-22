@@ -1,0 +1,81 @@
+<form [formGroup]="formUsuario" (ngSubmit)="guardar()" class="mb-4">
+  <div class="row">
+    <div class="col-md-4">
+      <label for="userName" class="form-label">UserName</label>
+      <input id="userName" type="text" class="form-control"
+             formControlName="userName" required />
+    </div>
+    <div class="col-md-4">
+      <label for="nombre" class="form-label">Nombre</label>
+      <input id="nombre" type="text" class="form-control"
+             formControlName="nombre" required />
+    </div>
+    <div class="col-md-4">
+      <label for="apellidoPaterno" class="form-label">Apellido Paterno</label>
+      <input id="apellidoPaterno" type="text" class="form-control"
+             formControlName="apellidoPaterno" required />
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-md-4">
+      <label for="apellidoMaterno" class="form-label">Apellido Materno</label>
+      <input id="apellidoMaterno" type="text" class="form-control"
+             formControlName="apellidoMaterno" />
+    </div>
+    <div class="col-md-4">
+      <label for="email" class="form-label">Email</label>
+      <input id="email" type="email" class="form-control"
+             formControlName="email" required />
+    </div>
+    <div class="col-md-4">
+      <label for="password" class="form-label">Password</label>
+      <input id="password" type="password" class="form-control"
+             formControlName="password" required />
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-md-4">
+      <label for="telefono" class="form-label">Teléfono</label>
+      <input id="telefono" type="text" class="form-control"
+             formControlName="telefono" required />
+    </div>
+    <div class="col-md-4">
+      <label for="celular" class="form-label">Celular</label>
+      <input id="celular" type="text" class="form-control"
+             formControlName="celular" />
+    </div>
+    <div class="col-md-4">
+      <label for="sexo" class="form-label">Sexo</label>
+      <select id="sexo" class="form-select"
+              formControlName="sexo" required>
+        <option value="">Seleccione...</option>
+        <option value="M">Masculino</option>
+        <option value="F">Femenino</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-md-4">
+      <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+      <input id="fechaNacimiento" type="date" class="form-control"
+             formControlName="fechaNacimiento" />
+    </div>
+    <div class="col-md-4">
+      <label for="curp" class="form-label">CURP</label>
+      <input id="curp" type="text" class="form-control"
+             formControlName="curp" />
+    </div>
+    <div class="col-md-4">
+      <label for="idRol" class="form-label">Rol (Id)</label>
+      <input id="idRol" type="number" class="form-control"
+             formControlName="idRol" required />
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary">
+    {{ usuario ? 'Actualizar' : 'Agregar' }}
+  </button>
+</form>
